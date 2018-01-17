@@ -100,6 +100,7 @@
     "docker-run": "./run.sh",
     "docker-start": "./start_container.sh",
     "docker-push": "./push_to_docker_hub.sh",
+    "prod": "webpack --progress --colors --config scripts/webpack/webpack.prod.js",
     "dev": "webpack --progress --colors --config scripts/webpack/webpack.dev.js",
     "watch": "webpack --progress --colors --watch --config scripts/webpack/webpack.dev.js",
     "build": "grunt build",
