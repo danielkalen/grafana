@@ -5,10 +5,10 @@ coverage/
 awsconfig
 /dist
 # /public/build
-/public/views/index.html
+# /public/views/index.html
 /emails/dist
 /public_gen
-/public/vendor/npm
+# /public/vendor/npm
 /tmp
 vendor/phantomjs/phantomjs
 vendor/phantomjs/phantomjs.exe
