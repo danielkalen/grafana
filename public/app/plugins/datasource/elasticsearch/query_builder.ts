@@ -267,6 +267,8 @@ export class ElasticQueryBuilder {
           metricAgg = { buckets_path: {} };
           for (var j = 0; j < target.metrics.length; j++) {
             var the_metric = target.metrics[j];
+            metricAgg['buckets_path']['agg' + j] = the_metric.id;
+
             if (the_metric.type !== 'count' && !queryDef.isPipelineAgg(the_metric.type)) {
               var key = the_metric.field.replace(/[^A-Za-z0-9]/gi, '');
               metricAgg['buckets_path'][key] = the_metric.id;
