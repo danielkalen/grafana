@@ -147,6 +147,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["getPipelineOptions"] = getPipelineOptions;
 /* harmony export (immutable) */ __webpack_exports__["isPipelineAgg"] = isPipelineAgg;
 /* harmony export (immutable) */ __webpack_exports__["isBucketScriptAgg"] = isBucketScriptAgg;
+/* harmony export (immutable) */ __webpack_exports__["isFilterAgg"] = isFilterAgg;
 /* harmony export (immutable) */ __webpack_exports__["getPipelineAggOptions"] = getPipelineAggOptions;
 /* harmony export (immutable) */ __webpack_exports__["getMovingAvgSettings"] = getMovingAvgSettings;
 /* harmony export (immutable) */ __webpack_exports__["getOrderByOptions"] = getOrderByOptions;
@@ -227,6 +228,13 @@ var metricAggTypes = [
         isPipelineAgg: true,
         minVersion: 2,
     },
+    {
+        text: 'Filter',
+        value: 'filter',
+        requiresField: false,
+        isPipelineAgg: true,
+        minVersion: 2,
+    },
     { text: 'Raw Document', value: 'raw_document', requiresField: false },
 ];
 var bucketAggTypes = [
@@ -284,6 +292,7 @@ var pipelineOptions = {
     ],
     derivative: [{ text: 'unit', default: undefined }],
     bucket_script: [{ text: 'script', default: '0' }],
+    filter: [{ text: 'query', default: '*' }],
 };
 var movingAvgModelSettings = {
     simple: [],
@@ -323,6 +332,9 @@ function isPipelineAgg(metricType) {
 }
 function isBucketScriptAgg(metricType) {
     return this.isPipelineAgg(metricType) && metricType === 'bucket_script';
+}
+function isFilterAgg(metricType) {
+    return this.isPipelineAgg(metricType) && metricType === 'filter';
 }
 function getPipelineAggOptions(targets) {
     var result = [];
@@ -19631,14 +19643,28 @@ var ElasticQueryBuilder = /** @class */ (function () {
                 if (metric.pipelineAgg && /^\d*$/.test(metric.pipelineAgg)) {
                     metricAgg = { buckets_path: metric.pipelineAgg };
                 }
+                else if (__WEBPACK_IMPORTED_MODULE_0__query_def__["isFilterAgg"](metric.type)) {
+                    metricAgg = { query_string: { query: metric.settings.query } };
+                    aggField[metric.type] = metricAgg;
+                    nestedAggs.aggs[metric.pipelineAgg] = aggField;
+                    continue;
+                }
                 else if (__WEBPACK_IMPORTED_MODULE_0__query_def__["isBucketScriptAgg"](metric.type)) {
                     metricAgg = { buckets_path: {} };
                     for (var j = 0; j < target.metrics.length; j++) {
                         var the_metric = target.metrics[j];
-                        metricAgg['buckets_path']['agg' + j] = the_metric.id;
-                        if (the_metric.type !== 'count' && !__WEBPACK_IMPORTED_MODULE_0__query_def__["isPipelineAgg"](the_metric.type)) {
-                            var key = the_metric.field.replace(/[^A-Za-z0-9]/gi, '');
-                            metricAgg['buckets_path'][key] = the_metric.id;
+                        if (__WEBPACK_IMPORTED_MODULE_0__query_def__["isFilterAgg"](the_metric.type)) {
+                            metricAgg['buckets_path'][the_metric.pipelineAgg] = the_metric.pipelineAgg + '._count';
+                        }
+                        else if (!__WEBPACK_IMPORTED_MODULE_0__query_def__["isPipelineAgg"](the_metric.type)) {
+                            if (the_metric.type === 'count') {
+                                metricAgg['buckets_path']['agg' + j] = '_count';
+                            }
+                            else {
+                                var key = the_metric.field.replace(/[^A-Za-z0-9]/gi, '');
+                                metricAgg['buckets_path'][key] = the_metric.id;
+                                metricAgg['buckets_path']['agg' + j] = the_metric.id;
+                            }
                         }
                     }
                 }
@@ -20501,6 +20527,7 @@ var ElasticQueryCtrl = /** @class */ (function (_super) {
 
       if (queryDef.isPipelineAgg($scope.agg.type)) {
         var default_text = queryDef.isBucketScriptAgg($scope.agg.type) ? 'metric name':'select metric';
+        default_text = queryDef.isFilterAgg($scope.agg.type) ? 'name' : default_text;
         $scope.agg.pipelineAgg = $scope.agg.pipelineAgg || default_text;
         $scope.agg.field = $scope.agg.pipelineAgg;
 
@@ -41737,4 +41764,4 @@ __WEBPACK_IMPORTED_MODULE_0_app_core_core_module__["default"].controller('StyleG
 /***/ })
 
 });
-//# sourceMappingURL=0.9bff1d7edcf31e027a50.js.map
+//# sourceMappingURL=0.a859a2be98397e620eef.js.map

@@ -71,6 +71,13 @@ export const metricAggTypes = [
     isPipelineAgg: true,
     minVersion: 2,
   },
+  {
+    text: 'Filter',
+    value: 'filter',
+    requiresField: false,
+    isPipelineAgg: true,
+    minVersion: 2,
+  },
   { text: 'Raw Document', value: 'raw_document', requiresField: false },
 ];
 
@@ -136,6 +143,7 @@ export const pipelineOptions = {
   ],
   derivative: [{ text: 'unit', default: undefined }],
   bucket_script: [{ text: 'script', default: '0' }],
+  filter: [{ text: 'query', default: '*' }],
 };
 
 export const movingAvgModelSettings = {
@@ -181,6 +189,10 @@ export function isPipelineAgg(metricType) {
 
 export function isBucketScriptAgg(metricType) {
   return this.isPipelineAgg(metricType) && metricType === 'bucket_script';
+}
+
+export function isFilterAgg(metricType) {
+  return this.isPipelineAgg(metricType) && metricType === 'filter';
 }
 
 export function getPipelineAggOptions(targets) {

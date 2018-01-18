@@ -263,15 +263,26 @@ export class ElasticQueryBuilder {
       if (queryDef.isPipelineAgg(metric.type)) {
         if (metric.pipelineAgg && /^\d*$/.test(metric.pipelineAgg)) {
           metricAgg = { buckets_path: metric.pipelineAgg };
+        } else if (queryDef.isFilterAgg(metric.type)) {
+          metricAgg = { query_string: { query: metric.settings.query } };
+          aggField[metric.type] = metricAgg;
+          nestedAggs.aggs[metric.pipelineAgg] = aggField;
+          continue;
         } else if (queryDef.isBucketScriptAgg(metric.type)) {
           metricAgg = { buckets_path: {} };
           for (var j = 0; j < target.metrics.length; j++) {
             var the_metric = target.metrics[j];
-            metricAgg['buckets_path']['agg' + j] = the_metric.id;
 
-            if (the_metric.type !== 'count' && !queryDef.isPipelineAgg(the_metric.type)) {
-              var key = the_metric.field.replace(/[^A-Za-z0-9]/gi, '');
-              metricAgg['buckets_path'][key] = the_metric.id;
+            if (queryDef.isFilterAgg(the_metric.type)) {
+              metricAgg['buckets_path'][the_metric.pipelineAgg] = the_metric.pipelineAgg + '._count';
+            } else if (!queryDef.isPipelineAgg(the_metric.type)) {
+              if (the_metric.type === 'count') {
+                metricAgg['buckets_path']['agg' + j] = '_count';
+              } else {
+                var key = the_metric.field.replace(/[^A-Za-z0-9]/gi, '');
+                metricAgg['buckets_path'][key] = the_metric.id;
+                metricAgg['buckets_path']['agg' + j] = the_metric.id;
+              }
             }
           }
         } else {

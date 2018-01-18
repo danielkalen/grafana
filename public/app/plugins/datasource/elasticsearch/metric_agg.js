@@ -59,6 +59,7 @@ function (angular, _, queryDef) {
 
       if (queryDef.isPipelineAgg($scope.agg.type)) {
         var default_text = queryDef.isBucketScriptAgg($scope.agg.type) ? 'metric name':'select metric';
+        default_text = queryDef.isFilterAgg($scope.agg.type) ? 'name' : default_text;
         $scope.agg.pipelineAgg = $scope.agg.pipelineAgg || default_text;
         $scope.agg.field = $scope.agg.pipelineAgg;
 
