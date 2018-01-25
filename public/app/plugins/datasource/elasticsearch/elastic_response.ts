@@ -140,6 +140,10 @@ export class ElasticResponse {
             addMetricValue(values, this.getMetricName(metric.type), bucket.doc_count);
             break;
           }
+          case 'filter': {
+            addMetricValue(values, metric.field, bucket[metric.field].doc_count);
+            break;
+          }
           case 'extended_stats': {
             for (var statName in metric.meta) {
               if (!metric.meta[statName]) {

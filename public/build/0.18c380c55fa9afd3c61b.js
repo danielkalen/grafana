@@ -19917,6 +19917,10 @@ var ElasticResponse = /** @class */ (function () {
                         addMetricValue(values, this.getMetricName(metric.type), bucket.doc_count);
                         break;
                     }
+                    case 'filter': {
+                        addMetricValue(values, metric.field, bucket[metric.field].doc_count);
+                        break;
+                    }
                     case 'extended_stats': {
                         for (var statName in metric.meta) {
                             if (!metric.meta[statName]) {
@@ -41764,4 +41768,4 @@ __WEBPACK_IMPORTED_MODULE_0_app_core_core_module__["default"].controller('StyleG
 /***/ })
 
 });
-//# sourceMappingURL=0.a859a2be98397e620eef.js.map
+//# sourceMappingURL=0.18c380c55fa9afd3c61b.js.map
