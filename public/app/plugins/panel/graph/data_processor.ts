@@ -21,6 +21,14 @@ export class DataProcessor {
       }
     }
 
+    if (this.panel.xaxis.mode === 'series' && firstItem && firstItem.type === 'table') {
+      this.panel.xaxis.isTable = true;
+      var rows = _.flatten(_.map(options.dataList, 'rows'));
+      return rows.map((item, index) => {
+        return this.tableSeriesHandler(item, index, options);
+      });
+    }
+
     switch (this.panel.xaxis.mode) {
       case 'series':
       case 'time': {
@@ -49,8 +57,8 @@ export class DataProcessor {
     switch (firstItem.type) {
       case 'docs':
         return 'field';
-      case 'table':
-        return 'field';
+      // case 'table':
+      //   return 'field';
       default: {
         if (this.panel.xaxis.mode === 'series') {
           return 'series';
@@ -121,12 +129,27 @@ export class DataProcessor {
     return series;
   }
 
+  tableSeriesHandler(seriesData, index, options) {
+    var alias = seriesData[0];
+    var colorIndex = index % colors.length;
+    var color = this.panel.aliasColors[alias] || colors[colorIndex];
+    var columnIndex = this.panel.xaxis.values[0];
+    var value = columnIndex > -1 ? seriesData[columnIndex] : seriesData[1];
+
+    var series = new TimeSeries({
+      datapoints: [[value, Date.now()]],
+      alias: alias,
+      color: color,
+      unit: undefined,
+    });
+
+    return series;
+  }
+
   customHandler(dataItem) {
     let nameField = this.panel.xaxis.name;
     if (!nameField) {
-      throw {
-        message: 'No field name specified to use for x-axis, check your axes settings',
-      };
+      throw new Error('No field name specified to use for x-axis, check your axes settings');
     }
     return [];
   }
@@ -134,6 +157,9 @@ export class DataProcessor {
   validateXAxisSeriesValue() {
     switch (this.panel.xaxis.mode) {
       case 'series': {
+        if (this.panel.xaxis.isTable) {
+          return;
+        }
         if (this.panel.xaxis.values.length === 0) {
           this.panel.xaxis.values = ['total'];
           return;

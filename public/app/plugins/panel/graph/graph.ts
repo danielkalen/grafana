@@ -228,7 +228,11 @@ function graphDirective(timeSrv, popoverSrv, contextSrv) {
 
             for (let i = 0; i < data.length; i++) {
               let series = data[i];
-              series.data = [[i + 1, series.stats[panel.xaxis.values[0]]]];
+              if (panel.xaxis.isTable) {
+                series.data = [[i + 1, series.data[0][1]]];
+              } else {
+                series.data = [[i + 1, series.stats[panel.xaxis.values[0]]]];
+              }
             }
 
             addXSeriesAxis(options);

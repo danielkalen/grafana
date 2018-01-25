@@ -25337,7 +25337,12 @@ function graphDirective(timeSrv, popoverSrv, contextSrv) {
                         options.series.bars.align = 'center';
                         for (var i = 0; i < data.length; i++) {
                             var series = data[i];
-                            series.data = [[i + 1, series.stats[panel.xaxis.values[0]]]];
+                            if (panel.xaxis.isTable) {
+                                series.data = [[i + 1, series.data[0][1]]];
+                            }
+                            else {
+                                series.data = [[i + 1, series.stats[panel.xaxis.values[0]]]];
+                            }
                         }
                         addXSeriesAxis(options);
                         break;
@@ -27476,6 +27481,13 @@ var DataProcessor = /** @class */ (function () {
                 this.setPanelDefaultsForNewXAxisMode();
             }
         }
+        if (this.panel.xaxis.mode === 'series' && firstItem && firstItem.type === 'table') {
+            this.panel.xaxis.isTable = true;
+            var rows = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.flatten(__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.map(options.dataList, 'rows'));
+            return rows.map(function (item, index) {
+                return _this.tableSeriesHandler(item, index, options);
+            });
+        }
         switch (this.panel.xaxis.mode) {
             case 'series':
             case 'time': {
@@ -27503,8 +27515,8 @@ var DataProcessor = /** @class */ (function () {
         switch (firstItem.type) {
             case 'docs':
                 return 'field';
-            case 'table':
-                return 'field';
+            // case 'table':
+            //   return 'field';
             default: {
                 if (this.panel.xaxis.mode === 'series') {
                     return 'series';
@@ -27568,18 +27580,33 @@ var DataProcessor = /** @class */ (function () {
         }
         return series;
     };
+    DataProcessor.prototype.tableSeriesHandler = function (seriesData, index, options) {
+        var alias = seriesData[0];
+        var colorIndex = index % __WEBPACK_IMPORTED_MODULE_2_app_core_utils_colors__["f" /* default */].length;
+        var color = this.panel.aliasColors[alias] || __WEBPACK_IMPORTED_MODULE_2_app_core_utils_colors__["f" /* default */][colorIndex];
+        var columnIndex = this.panel.xaxis.values[0];
+        var value = columnIndex > -1 ? seriesData[columnIndex] : seriesData[1];
+        var series = new __WEBPACK_IMPORTED_MODULE_1_app_core_time_series2__["a" /* default */]({
+            datapoints: [[value, Date.now()]],
+            alias: alias,
+            color: color,
+            unit: undefined
+        });
+        return series;
+    };
     DataProcessor.prototype.customHandler = function (dataItem) {
         var nameField = this.panel.xaxis.name;
         if (!nameField) {
-            throw {
-                message: 'No field name specified to use for x-axis, check your axes settings',
-            };
+            throw new Error('No field name specified to use for x-axis, check your axes settings');
         }
         return [];
     };
     DataProcessor.prototype.validateXAxisSeriesValue = function () {
         switch (this.panel.xaxis.mode) {
             case 'series': {
+                if (this.panel.xaxis.isTable) {
+                    return;
+                }
                 if (this.panel.xaxis.values.length === 0) {
                     this.panel.xaxis.values = ['total'];
                     return;
@@ -27663,7 +27690,10 @@ var DataProcessor = /** @class */ (function () {
 "use strict";
 /* unused harmony export AxesEditorCtrl */
 /* harmony export (immutable) */ __webpack_exports__["a"] = axesEditorComponent;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_app_core_utils_kbn__ = __webpack_require__(222);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_app_core_utils_kbn__ = __webpack_require__(222);
+
 
 var AxesEditorCtrl = /** @class */ (function () {
     /** @ngInject **/
@@ -27673,7 +27703,7 @@ var AxesEditorCtrl = /** @class */ (function () {
         this.panelCtrl = $scope.ctrl;
         this.panel = this.panelCtrl.panel;
         this.$scope.ctrl = this;
-        this.unitFormats = __WEBPACK_IMPORTED_MODULE_0_app_core_utils_kbn__["a" /* default */].getUnitFormats();
+        this.unitFormats = __WEBPACK_IMPORTED_MODULE_1_app_core_utils_kbn__["a" /* default */].getUnitFormats();
         this.logScales = {
             linear: 1,
             'log (base 2)': 2,
@@ -27706,6 +27736,19 @@ var AxesEditorCtrl = /** @class */ (function () {
     };
     AxesEditorCtrl.prototype.render = function () {
         this.panelCtrl.render();
+    };
+    AxesEditorCtrl.prototype.getxAxisStatOptions = function () {
+        var firstItem = this.panelCtrl.dataList[0];
+        if (firstItem && firstItem.type === 'table') {
+            var result = firstItem.columns.map(function (column, index) { return { text: column.text, value: index + '' }; });
+            if (this.xAxisLastOptions && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(this.xAxisLastOptions, result)) {
+                result = this.xAxisLastOptions;
+            }
+            return this.xAxisLastOptions = result;
+        }
+        else {
+            return this.xAxisStatOptions;
+        }
     };
     AxesEditorCtrl.prototype.xAxisModeChanged = function () {
         this.panelCtrl.processor.setPanelDefaultsForNewXAxisMode();
@@ -41768,4 +41811,4 @@ __WEBPACK_IMPORTED_MODULE_0_app_core_core_module__["default"].controller('StyleG
 /***/ })
 
 });
-//# sourceMappingURL=0.18c380c55fa9afd3c61b.js.map
+//# sourceMappingURL=0.aa868a4968c425e0c33c.js.map

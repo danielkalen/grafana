@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import kbn from 'app/core/utils/kbn';
 
 export class AxesEditorCtrl {
@@ -8,6 +9,7 @@ export class AxesEditorCtrl {
   xAxisModes: any;
   xAxisStatOptions: any;
   xNameSegment: any;
+  xAxisLastOptions: any;
 
   /** @ngInject **/
   constructor(private $scope, private $q) {
@@ -55,6 +57,21 @@ export class AxesEditorCtrl {
 
   render() {
     this.panelCtrl.render();
+  }
+
+  getxAxisStatOptions() {
+    var firstItem = this.panelCtrl.dataList[0];
+    if (firstItem && firstItem.type === 'table') {
+      var result = firstItem.columns.map((column, index) => {
+        return { text: column.text, value: index + '' };
+      });
+      if (this.xAxisLastOptions && _.isEqual(this.xAxisLastOptions, result)) {
+        result = this.xAxisLastOptions;
+      }
+      return (this.xAxisLastOptions = result);
+    } else {
+      return this.xAxisStatOptions;
+    }
   }
 
   xAxisModeChanged() {
