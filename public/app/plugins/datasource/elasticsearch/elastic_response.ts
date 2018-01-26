@@ -370,6 +370,7 @@ export class ElasticResponse {
         var target = this.targets[i];
         var tmpSeriesList = [];
         var table = new TableModel();
+        table.alias = target.alias;
 
         this.processBuckets(aggregations, target, tmpSeriesList, table, {}, 0);
         this.trimDatapoints(tmpSeriesList, target);

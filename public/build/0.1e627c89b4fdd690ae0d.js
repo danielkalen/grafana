@@ -20116,6 +20116,7 @@ var ElasticResponse = /** @class */ (function () {
                 var target = this.targets[i];
                 var tmpSeriesList = [];
                 var table = new __WEBPACK_IMPORTED_MODULE_2_app_core_table_model__["a" /* default */]();
+                table.alias = target.alias;
                 this.processBuckets(aggregations, target, tmpSeriesList, table, {}, 0);
                 this.trimDatapoints(tmpSeriesList, target);
                 this.nameSeries(tmpSeriesList, target);
@@ -27590,7 +27591,7 @@ var DataProcessor = /** @class */ (function () {
             datapoints: [[value, Date.now()]],
             alias: alias,
             color: color,
-            unit: undefined
+            unit: undefined,
         });
         return series;
     };
@@ -27740,11 +27741,13 @@ var AxesEditorCtrl = /** @class */ (function () {
     AxesEditorCtrl.prototype.getxAxisStatOptions = function () {
         var firstItem = this.panelCtrl.dataList[0];
         if (firstItem && firstItem.type === 'table') {
-            var result = firstItem.columns.map(function (column, index) { return { text: column.text, value: index + '' }; });
+            var result = firstItem.columns.map(function (column, index) {
+                return { text: column.text, value: index + '' };
+            });
             if (this.xAxisLastOptions && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isEqual(this.xAxisLastOptions, result)) {
                 result = this.xAxisLastOptions;
             }
-            return this.xAxisLastOptions = result;
+            return (this.xAxisLastOptions = result);
         }
         else {
             return this.xAxisStatOptions;
@@ -41811,4 +41814,4 @@ __WEBPACK_IMPORTED_MODULE_0_app_core_core_module__["default"].controller('StyleG
 /***/ })
 
 });
-//# sourceMappingURL=0.aa868a4968c425e0c33c.js.map
+//# sourceMappingURL=0.1e627c89b4fdd690ae0d.js.map
