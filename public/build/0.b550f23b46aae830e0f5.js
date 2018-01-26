@@ -24889,6 +24889,8 @@ var GraphCtrl = /** @class */ (function (_super) {
             stack: false,
             // stack percentage mode
             percentage: false,
+            // label formatter
+            labelformatter: "$label",
             // legend options
             legend: {
                 show: true,
@@ -25513,7 +25515,8 @@ function graphDirective(timeSrv, popoverSrv, contextSrv) {
             }
             function addXSeriesAxis(options) {
                 var ticks = __WEBPACK_IMPORTED_MODULE_10_lodash___default.a.map(data, function (series, index) {
-                    return [index + 1, series.alias];
+                    var alias = panel.labelformatter.replace(/\$label/g, series.alias);
+                    return [index + 1, alias];
                 });
                 options.xaxis = {
                     timezone: dashboard.getTimezone(),
@@ -41814,4 +41817,4 @@ __WEBPACK_IMPORTED_MODULE_0_app_core_core_module__["default"].controller('StyleG
 /***/ })
 
 });
-//# sourceMappingURL=0.1e627c89b4fdd690ae0d.js.map
+//# sourceMappingURL=0.b550f23b46aae830e0f5.js.map

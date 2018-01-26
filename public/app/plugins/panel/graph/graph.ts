@@ -414,8 +414,9 @@ function graphDirective(timeSrv, popoverSrv, contextSrv) {
       }
 
       function addXSeriesAxis(options) {
-        var ticks = _.map(data, function(series, index) {
-          return [index + 1, series.alias];
+        var ticks = _.map(data, (series, index) => {
+          var alias = panel.labelformatter.replace(/\$label/g, series.alias);
+          return [index + 1, alias];
         });
 
         options.xaxis = {

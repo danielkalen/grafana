@@ -77,6 +77,8 @@ class GraphCtrl extends MetricsPanelCtrl {
     stack: false,
     // stack percentage mode
     percentage: false,
+    // label formatter
+    labelformatter: '$label',
     // legend options
     legend: {
       show: true, // disable/enable legend
