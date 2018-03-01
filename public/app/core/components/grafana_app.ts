@@ -71,6 +71,7 @@ export function grafanaAppDirective(playlistSrv, contextSrv, $timeout, $rootScop
       body.toggleClass('sidemenu-open', sidemenuOpen);
 
       appEvents.on('toggle-sidemenu', () => {
+        sidemenuOpen = scope.contextSrv.sidemenu;
         body.toggleClass('sidemenu-open');
       });
 
@@ -81,6 +82,15 @@ export function grafanaAppDirective(playlistSrv, contextSrv, $timeout, $rootScop
       appEvents.on('toggle-sidemenu-hidden', () => {
         body.toggleClass('sidemenu-hidden');
       });
+
+      scope.$watch(() => playlistSrv.isPlaying, function(newValue) {
+        elem.toggleClass('playlist-active', newValue === true);
+      });
+
+      // check if we are in server side render
+      if (document.cookie.indexOf('renderKey') !== -1) {
+        body.addClass('body--phantomjs');
+      }
 
       // tooltip removal fix
       // manage page classes
@@ -167,6 +177,8 @@ export function grafanaAppDirective(playlistSrv, contextSrv, $timeout, $rootScop
       // mouse and keyboard is user activity
       body.mousemove(userActivityDetected);
       body.keydown(userActivityDetected);
+      // set useCapture = true to catch event here
+      document.addEventListener('wheel', userActivityDetected, true);
       // treat tab change as activity
       document.addEventListener('visibilitychange', userActivityDetected);
 

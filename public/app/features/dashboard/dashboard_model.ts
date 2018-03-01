@@ -12,6 +12,7 @@ import { DashboardMigrator } from './dashboard_migration';
 
 export class DashboardModel {
   id: any;
+  uid: any;
   title: any;
   autoUpdate: any;
   description: any;
@@ -56,6 +57,7 @@ export class DashboardModel {
 
     this.events = new Emitter();
     this.id = data.id || null;
+    this.uid = data.uid || null;
     this.revision = data.revision;
     this.title = data.title || 'No Title';
     this.autoUpdate = data.autoUpdate;
@@ -279,6 +281,40 @@ export class DashboardModel {
     this.events.emit('repeats-processed');
   }
 
+  cleanUpRowRepeats(rowPanels) {
+    let panelsToRemove = [];
+    for (let i = 0; i < rowPanels.length; i++) {
+      let panel = rowPanels[i];
+      if (!panel.repeat && panel.repeatPanelId) {
+        panelsToRemove.push(panel);
+      }
+    }
+    _.pull(rowPanels, ...panelsToRemove);
+    _.pull(this.panels, ...panelsToRemove);
+  }
+
+  processRowRepeats(row: PanelModel) {
+    if (this.snapshot || this.templating.list.length === 0) {
+      return;
+    }
+
+    let rowPanels = row.panels;
+    if (!row.collapsed) {
+      let rowPanelIndex = _.findIndex(this.panels, p => p.id === row.id);
+      rowPanels = this.getRowPanels(rowPanelIndex);
+    }
+
+    this.cleanUpRowRepeats(rowPanels);
+
+    for (let i = 0; i < rowPanels.length; i++) {
+      let panel = rowPanels[i];
+      if (panel.repeat) {
+        let panelIndex = _.findIndex(this.panels, p => p.id === panel.id);
+        this.repeatPanel(panel, panelIndex);
+      }
+    }
+  }
+
   getPanelRepeatClone(sourcePanel, valueIndex, sourcePanelIndex) {
     // if first clone return source
     if (valueIndex === 0) {
@@ -352,8 +388,10 @@ export class DashboardModel {
       copy.scopedVars[variable.name] = option;
 
       if (panel.repeatDirection === REPEAT_DIR_VERTICAL) {
+        if (index > 0) {
+          yPos += copy.gridPos.h;
+        }
         copy.gridPos.y = yPos;
-        yPos += copy.gridPos.h;
       } else {
         // set width based on how many are selected
         // assumed the repeated panels should take up full row width
@@ -368,6 +406,15 @@ export class DashboardModel {
           xPos = 0;
           yPos += copy.gridPos.h;
         }
+      }
+    }
+
+    // Update gridPos for panels below
+    let yOffset = yPos - panel.gridPos.y;
+    if (yOffset > 0) {
+      let panelBelowIndex = panelIndex + selectedOptions.length;
+      for (let i = panelBelowIndex; i < this.panels.length; i++) {
+        this.panels[i].gridPos.y += yOffset;
       }
     }
   }
@@ -453,11 +500,12 @@ export class DashboardModel {
     if (!rowPanel.panels || rowPanel.panels.length === 0) {
       return 0;
     }
+    const rowYPos = rowPanel.gridPos.y;
     const positions = _.map(rowPanel.panels, 'gridPos');
     const maxPos = _.maxBy(positions, pos => {
       return pos.y + pos.h;
     });
-    return maxPos.h + 1;
+    return maxPos.y + maxPos.h - rowYPos;
   }
 
   removePanel(panel: PanelModel) {
@@ -474,6 +522,34 @@ export class DashboardModel {
     }
 
     this.removePanel(row);
+  }
+
+  expandRows() {
+    for (let i = 0; i < this.panels.length; i++) {
+      var panel = this.panels[i];
+
+      if (panel.type !== 'row') {
+        continue;
+      }
+
+      if (panel.collapsed) {
+        this.toggleRow(panel);
+      }
+    }
+  }
+
+  collapseRows() {
+    for (let i = 0; i < this.panels.length; i++) {
+      var panel = this.panels[i];
+
+      if (panel.type !== 'row') {
+        continue;
+      }
+
+      if (!panel.collapsed) {
+        this.toggleRow(panel);
+      }
+    }
   }
 
   setPanelFocus(id) {
@@ -558,6 +634,7 @@ export class DashboardModel {
 
     if (row.collapsed) {
       row.collapsed = false;
+      let hasRepeat = _.some(row.panels, p => p.repeat);
 
       if (row.panels.length > 0) {
         // Use first panel to figure out if it was moved or pushed
@@ -588,6 +665,10 @@ export class DashboardModel {
         }
 
         row.panels = [];
+
+        if (hasRepeat) {
+          this.processRowRepeats(row);
+        }
       }
 
       // sort panels
