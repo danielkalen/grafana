@@ -6490,6 +6490,8 @@ input.ng-dirty.ng-invalid {
       -ms-flex-positive: 1;
           flex-grow: 1;
   background: linear-gradient(-60deg, transparent 70%, #f7f8fa 98%); }
+  .dashboard-solo.theme-light .main-view {
+    background: white; }
 
 .page-container {
   margin-left: auto;

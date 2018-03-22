@@ -24,7 +24,7 @@ export function setupAngularRoutes($routeProvider, $locationProvider) {
       templateUrl: 'public/app/features/panel/partials/soloPanel.html',
       controller: 'SoloPanelCtrl',
       reloadOnSearch: false,
-      pageClass: 'page-dashboard',
+      pageClass: 'page-dashboard sidemenu-hidden dashboard-solo',
     })
     .when('/dashboard/new', {
       templateUrl: 'public/app/partials/dashboard.html',

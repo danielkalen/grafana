@@ -12,6 +12,10 @@
   position: relative;
   flex-grow: 1;
   background: $page-gradient;
+
+  .dashboard-solo.theme-light & {
+    background: white;
+  }
 }
 
 .page-container {
@@ -66,9 +70,7 @@
 }
 
 .sidebar-content {
-  width: calc(
-    100% - #{$page-sidebar-width + $page-sidebar-margin}
-  ); // sidebar width + margin
+  width: calc(100% - #{$page-sidebar-width + $page-sidebar-margin}); // sidebar width + margin
 }
 
 .sidebar-container {

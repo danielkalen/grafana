@@ -2,7 +2,7 @@ import $ from 'jquery';
 import { coreModule } from 'app/core/core';
 
 var template = `
-<span class="panel-title">
+<span class="panel-title" ng-show="!ctrl.panel.soloMode">
   <span class="icon-gf panel-alert-icon"></span>
   <span class="panel-title-text">{{ctrl.panel.title | interpolateTemplateVars:this}}</span>
   <span class="panel-menu-container dropdown">
