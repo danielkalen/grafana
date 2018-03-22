@@ -6543,7 +6543,7 @@ input.ng-dirty.ng-invalid {
           flex-grow: 1; }
 
 .sidebar-content {
-  width: calc( 100% - 15rem); }
+  width: calc(100% - 15rem); }
 
 @media (min-width: 768px) {
   .sidebar-container {
