@@ -260,6 +260,11 @@ describe('templateSrv', function() {
       expect(result).toBe('test');
     });
 
+    it('multi value and csv format should render csv string', function() {
+      var result = _templateSrv.formatValue(['test', 'test2'], 'csv');
+      expect(result).toBe('test,test2');
+    });
+
     it('slash should be properly escaped in regex format', function() {
       var result = _templateSrv.formatValue('Gi3/14', 'regex');
       expect(result).toBe('Gi3\\/14');
