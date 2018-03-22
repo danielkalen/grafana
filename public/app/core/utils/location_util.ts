@@ -1,6 +1,7 @@
 import config from 'app/core/config';
 
 const _stripBaseFromUrl = url => {
+  // url = url || '';
   const appSubUrl = config.appSubUrl;
   const stripExtraChars = appSubUrl.endsWith('/') ? 1 : 0;
   const urlWithoutBase =

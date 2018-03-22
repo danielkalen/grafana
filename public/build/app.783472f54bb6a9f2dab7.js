@@ -2569,6 +2569,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_app_core_config__ = __webpack_require__(22);
 
 var _stripBaseFromUrl = function (url) {
+    // url = url || '';
     var appSubUrl = __WEBPACK_IMPORTED_MODULE_0_app_core_config__["a" /* default */].appSubUrl;
     var stripExtraChars = appSubUrl.endsWith('/') ? 1 : 0;
     var urlWithoutBase = url.length > 0 && url.indexOf(appSubUrl) === 0 ? url.slice(appSubUrl.length - stripExtraChars) : url;
@@ -30530,14 +30531,14 @@ var LoadDashboardCtrl = /** @class */ (function () {
             return;
         }
         // if no uid, redirect to new route based on slug
-        if (!($routeParams.type === 'script' || $routeParams.type === 'snapshot') && !$routeParams.uid) {
-            backendSrv.getDashboardBySlug($routeParams.slug).then(function (res) {
-                if (res) {
-                    $location.path(__WEBPACK_IMPORTED_MODULE_1_app_core_utils_location_util__["a" /* default */].stripBaseFromUrl(res.meta.url)).replace();
-                }
-            });
-            return;
-        }
+        // if (!($routeParams.type === 'script' || $routeParams.type === 'snapshot') && !$routeParams.uid) {
+        //   backendSrv.getDashboardBySlug($routeParams.slug).then(res => {
+        //     if (res) {
+        //       $location.path(locationUtil.stripBaseFromUrl(res.meta.url)).replace();
+        //     }
+        //   });
+        //   return;
+        // }
         dashboardLoaderSrv.loadDashboard($routeParams.type, $routeParams.slug, $routeParams.uid).then(function (result) {
             if (result.meta.url) {
                 var url = __WEBPACK_IMPORTED_MODULE_1_app_core_utils_location_util__["a" /* default */].stripBaseFromUrl(result.meta.url);
@@ -31099,4 +31100,4 @@ var FolderPermissions = /** @class */ (function (_super) {
 
 /***/ })
 ],[534]);
-//# sourceMappingURL=app.417f403df9e418fbc9d8.js.map
+//# sourceMappingURL=app.783472f54bb6a9f2dab7.js.map
