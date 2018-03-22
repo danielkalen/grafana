@@ -12242,6 +12242,7 @@ json-tree .json-tree-branch-preview {
   padding-right: 10px;
   vertical-align: middle; }
   .Select-input > input {
+    width: 100%;
     background: none transparent;
     border: 0 none;
     box-shadow: none;
@@ -12361,6 +12362,7 @@ json-tree .json-tree-branch-preview {
   margin-top: -1px;
   max-height: 300px;
   position: absolute;
+  left: 0;
   top: 100%;
   width: 100%;
   z-index: 1000;
